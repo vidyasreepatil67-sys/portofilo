@@ -20,99 +20,105 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+// MongoDB connection (commented out for now)
+// mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// })
+// .then(() => console.log('MongoDB connected'))
+// .catch(err => console.error('MongoDB connection error:', err));
 
-// Schema definitions
-const projectSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  technologies: [String],
-  githubUrl: String,
-  liveUrl: String,
-  imageUrl: String,
-  featured: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now }
+console.log('Server running without MongoDB connection');
+
+// Schema definitions (commented out for now)
+// const projectSchema = new mongoose.Schema({
+//   title: { type: String, required: true },
+//   description: { type: String, required: true },
+//   technologies: [String],
+//   githubUrl: String,
+//   liveUrl: String,
+//   imageUrl: String,
+//   featured: { type: Boolean, default: false },
+//   createdAt: { type: Date, default: Date.now }
+// });
+
+// const skillSchema = new mongoose.Schema({
+//   name: { type: String, required: true },
+//   category: { type: String, required: true },
+//   level: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced', 'Expert'], required: true }
+// });
+
+// const contactSchema = new mongoose.Schema({
+//   name: { type: String, required: true },
+//   email: { type: String, required: true },
+//   message: { type: String, required: true },
+//   createdAt: { type: Date, default: Date.now }
+// });
+
+// const Project = mongoose.model('Project', projectSchema);
+// const Skill = mongoose.model('Skill', skillSchema);
+// const Contact = mongoose.model('Contact', contactSchema);
+
+// Routes with mock data (no MongoDB required)
+app.get('/api/projects', (req, res) => {
+  const projects = [
+    {
+      _id: '1',
+      title: 'Campus Intelligence System',
+      description: 'An innovative campus management system with real-time tracking and analytics for educational institutions.',
+      technologies: ['Java', 'Spring Boot', 'MySQL'],
+      githubUrl: 'https://github.com/vidyasreepatil67-sys/Campus-Intelligence-System',
+      liveUrl: 'https://campus-demo.example.com',
+      imageUrl: '/project1.jpg',
+      featured: true,
+      createdAt: new Date()
+    }
+  ];
+  res.json(projects);
 });
 
-const skillSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  category: { type: String, required: true },
-  level: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced', 'Expert'], required: true }
+app.get('/api/projects/featured', (req, res) => {
+  const projects = [
+    {
+      _id: '1',
+      title: 'Campus Intelligence System',
+      description: 'An innovative campus management system with real-time tracking and analytics for educational institutions.',
+      technologies: ['Java', 'Spring Boot', 'MySQL'],
+      githubUrl: 'https://github.com/vidyasreepatil67-sys/Campus-Intelligence-System',
+      liveUrl: 'https://campus-demo.example.com',
+      imageUrl: '/project1.jpg',
+      featured: true,
+      createdAt: new Date()
+    }
+  ];
+  res.json(projects);
 });
 
-const contactSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  message: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
+app.post('/api/projects', (req, res) => {
+  res.status(201).json({ message: 'Project created (mock response)' });
 });
 
-const Project = mongoose.model('Project', projectSchema);
-const Skill = mongoose.model('Skill', skillSchema);
-const Contact = mongoose.model('Contact', contactSchema);
-
-// Routes
-app.get('/api/projects', async (req, res) => {
-  try {
-    const projects = await Project.find().sort({ createdAt: -1 });
-    res.json(projects);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+app.get('/api/skills', (req, res) => {
+  const skills = [
+    { _id: '1', name: 'Java', category: 'Java Development', level: 'Expert' },
+    { _id: '2', name: 'Spring Boot', category: 'Java Development', level: 'Advanced' },
+    { _id: '3', name: 'MySQL', category: 'Java Development', level: 'Advanced' },
+    { _id: '4', name: 'PostgreSQL', category: 'Database Skills', level: 'Advanced' },
+    { _id: '5', name: 'MongoDB', category: 'Database Skills', level: 'Intermediate' },
+    { _id: '6', name: 'Problem Solving', category: 'Programming Skills', level: 'Expert' },
+    { _id: '7', name: 'Data Structures', category: 'Programming Skills', level: 'Advanced' },
+    { _id: '8', name: 'Algorithms', category: 'Programming Skills', level: 'Advanced' }
+  ];
+  res.json(skills);
 });
 
-app.get('/api/projects/featured', async (req, res) => {
-  try {
-    const projects = await Project.find({ featured: true }).sort({ createdAt: -1 });
-    res.json(projects);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+app.post('/api/skills', (req, res) => {
+  res.status(201).json({ message: 'Skill created (mock response)' });
 });
 
-app.post('/api/projects', async (req, res) => {
-  try {
-    const project = new Project(req.body);
-    const savedProject = await project.save();
-    res.status(201).json(savedProject);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-app.get('/api/skills', async (req, res) => {
-  try {
-    const skills = await Skill.find().sort({ category: 1, name: 1 });
-    res.json(skills);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-app.post('/api/skills', async (req, res) => {
-  try {
-    const skill = new Skill(req.body);
-    const savedSkill = await skill.save();
-    res.status(201).json(savedSkill);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-app.post('/api/contact', async (req, res) => {
-  try {
-    const contact = new Contact(req.body);
-    const savedContact = await contact.save();
-    res.status(201).json({ message: 'Message sent successfully!' });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
+app.post('/api/contact', (req, res) => {
+  console.log('Contact form submission:', req.body);
+  res.status(201).json({ message: 'Message sent successfully!' });
 });
 
 app.get('/api/health', (req, res) => {
